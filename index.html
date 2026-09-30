@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>KANI HUB</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="navbar">
+        <div class="logo"><i class="fas fa-leaf"></i><span>KANI HUB</span></div>
+        <div class="nav-actions">
+          <div id="userDisplayArea" class="user-info" style="display: none;"><i class="fas fa-user-check"></i><span
+              id="currentUsername"></span></div>
+          <button id="aboutNavBtn" class="nav-btn" style="display: none;"><i class="fas fa-store"></i>
+            About</button>
+          <button id="trackOrderNavBtn" class="nav-btn" style="display: none;"><i class="fas fa-truck"></i>
+            Track Order</button>
+          <button id="logoutBtn" class="logout-btn" style="display: none;">Logout</button>
+          <div id="cartIconBtn" class="cart-icon" style="display: none;"><i
+              class="fas fa-shopping-basket"></i><span>Cart</span><span id="cartItemCount">0</span></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- SUMMER SEASON OFFER BANNER -->
+    <div class="offer-banner">
+      <i class="fas fa-sun"></i> ☀️ SUMMER SEASON OFFER! ☀️ <i class="fas fa-sun"></i><br>
+      🌱 Get FREE Organic Vegetable Seeds (Tomato, Brinjal, Chilli) on orders above ₹1000! 🌱
+    </div>
+    <div class="seed-offer">
+      <i class="fas fa-seedling"></i> Complimentary Seeds: Tomato, Brinjal & Chilli - Grow your own organic summer
+      garden! <i class="fas fa-seedling"></i>
+    </div>
+
+    <!-- WELCOME PAGE -->
+    <div id="welcomePage" class="welcome-page">
+      <div class="welcome-container">
+        <div class="welcome-hero">
+          <div class="welcome-logo"><i class="fas fa-seedling"></i><span>KANI HUB</span><i class="fas fa-apple-alt"></i>
+          </div>
+          <h1>Fresh from Farm to Fork</h1>
+          <p>Pure organic harvest • 5% GST • Free delivery across Pollachi</p>
+        </div>
+        <div style="padding: 1.5rem; text-align: center;">
+          <img class="featured-img" src="images/featured.jpg">
+        </div>
+        <div class="login-buttons">
+          <button id="welcomeUserBtn" class="btn-login btn-user"><i class="fas fa-user"></i> User Login /
+            Register</button>
+          <button id="welcomeAdminBtn" class="btn-login btn-admin"><i class="fas fa-shield-alt"></i> Admin
+            Login</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT PAGE -->
+    <div id="aboutPage" class="about-page">
+      <div class="about-hero">
+        <h2>🌱 About KANI HUB</h2>
+        <p>Your Trusted Organic Farm-to-Home Store since 2020</p>
+        <button id="shopNowFromAboutBtn" class="shop-now-btn-about"><i class="fas fa-shopping-bag"></i> Shop Now
+          →</button>
+      </div>
+      <div class="about-grid">
+        <div class="about-card">
+          <h3><i class="fas fa-store"></i> Shop Profile</h3>
+          <ul class="detail-list">
+            <li><i class="fas fa-building"></i> KANI HUB organic fruits, vegetables and greens</li>
+            <li><i class="fas fa-map-marker-alt"></i> No.330, Market Rd, Vinayagar Kovil, Pollachi, Tamil
+              Nadu - 642001</li>
+            <li><i class="fas fa-mail-bulk"></i> Pincode: 642001</li>
+            <li><i class="fas fa-file-invoice"></i> GST No.: 33AAACK1234H1ZQ</li>
+            <li><i class="fas fa-phone-alt"></i> +91 9842810020</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h3><i class="fas fa-eye"></i> Vision & Mission</h3>
+          <p><strong>Vision:</strong> Make organic food easily available to everyone, Promote healthy living,
+            Support sustainable farming, Build trust in chemical-free produce, Create a greener future.</p>
+          <p style="margin-top: 10px;"><strong>Mission:</strong> Deliver fresh organic fruits and vegetables,
+            Work directly with local farmers, Ensure fair prices for customers and farmers, Maintain quality
+            and freshness, Use eco-friendly packaging and delivery.</p>
+        </div>
+        <div class="about-card full-width-card">
+          <h3><i class="fas fa-star"></i> Why Choose Us?</h3>
+          <ul class="detail-list">
+            <li><i class="fas fa-check-circle"></i> Fresh harvest within 12 hours</li>
+            <li><i class="fas fa-check-circle"></i> 5% GST only</li>
+            <li><i class="fas fa-check-circle"></i> Free delivery across Pollachi</li>
+            <li><i class="fas fa-check-circle"></i> 50+ partner farmers</li>
+            <li><i class="fas fa-check-circle"></i> Summer Offers & Free Seeds on orders above ₹1000</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER TRACKING PAGE -->
+    <div id="trackOrderPage" class="about-page">
+      <div class="about-hero">
+        <h2>📦 Track Your Orders</h2>
+        <p>View and track your order status in real-time</p>
+      </div>
+      <div id="userOrdersList" class="tracking-container"></div>
+    </div>
+
+    <!-- STORE CONTENT -->
+    <div id="storeContent" class="store-content">
+      <div class="store-header">
+        <h2>Fresh from our farm</h2>
+        <p>No chemicals • 5% GST • Free Delivery</p>
+      </div>
+      <div class="products-container" id="productsContainer"></div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminDashboard" style="display: none;">
+      <div class="admin-container">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-apple-alt"></i></div>
+            <div class="stat-info">
+              <h3 id="statProducts">0</h3>
+              <p>Products</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+              <h3 id="statUsers">0</h3>
+              <p>Users</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="stat-info">
+              <h3 id="statOrders">0</h3>
+              <p>Orders</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-section">
+          <div class="section-title"><i class="fas fa-boxes"></i> 🛒 Manage Products - Add, Edit or Remove
+            Items</div>
+          <div class="product-form">
+            <div class="input-group"><input type="text" id="prodname" placeholder=" product name"><label>product
+                name</label></div>
+            <div class="input-group"><input type="number" id="prodprice" placeholder="Price (₹/kg)"><label>price</label>
+            </div>
+            <div class="input-group"><input type="number" id="prodquantity"
+                placeholder="Quantity (kg)"><label>quantity</label>
+            </div>
+            <div class="input-group"><select id="prodCategory">
+                <option value="fruit">Fruit</option>
+                <option value="vegetable">Vegetable</option>
+                <option value="greens">Greens</option>
+              </select></div>
+            <div class="input-group"><button id="addProductBtn"><i class="fas fa-plus"></i> Add Product</button></div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="admin-section">
+          <div class="section-title"><i class="fas fa-users"></i> 👥 Registered Users</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Orders</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="admin-section">
+          <div class="section-title"><i class="fas fa-truck"></i> 📦 Customer Orders</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECKOUT MODALS -->
+    <div id="customerDetailsModal" class="modal-overlay">
+      <div class="checkout-modal">
+        <span class="close-modal" id="closeCustomerModal">&times;</span>
+        <h2 style="text-align:center;">📋 Delivery Details</h2>
+        <div class="input-group"><input type="text" id="custName" placeholder=" "><label>Full Name</label></div>
+        <div class="input-group"><input type="tel" id="custPhone" placeholder=" "><label>Phone Number</label>
+        </div>
+        <div class="input-group"><textarea id="custAddress" rows="2" placeholder=" "></textarea><label>Address</label>
+        </div>
+        <div class="input-group"><input type="text" id="custPincode" placeholder=" "><label>Pincode</label>
+        </div>
+        <div class="input-group"><input type="date" id="deliveryDate" placeholder=" "><label>Delivery
+            Date</label></div>
+        <button id="nextToPaymentBtn">Proceed to Payment →</button>
+      </div>
+    </div>
+
+    <div id="paymentModal" class="modal-overlay">
+      <div class="checkout-modal">
+        <span class="close-modal" id="closePaymentModal">&times;</span>
+        <h2 style="text-align:center;">💰 Select Payment Method</h2>
+        <div class="input-group">
+          <select id="paymentMethod">
+            <option value="COD">Cash on Delivery (COD)</option>
+            <option value="UPI">UPI / QR Code</option>
+            <option value="NetBanking">Net Banking</option>
+          </select>
+        </div>
+        <div id="paymentDetailsContainer"
+          style="margin: 1rem 0; padding: 1rem; background: #f0f4eb; border-radius: 20px;"></div>
+        <div id="priceBreakdown"></div>
+        <button id="placeOrderBtn">Place Order</button>
+      </div>
+    </div>
+
+    <div id="invoiceModal" class="modal-overlay">
+      <div class="checkout-modal" style="max-width: 600px;">
+        <span class="close-modal" id="closeInvoiceModal">&times;</span>
+        <h2 style="text-align:center;">🧾 Order Invoice</h2>
+        <div id="invoiceContent" class="invoice-content"></div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button id="downloadInvoiceBtn" style="flex: 1;"><i class="fas fa-download"></i> Download
+            PDF</button>
+          <button id="continueShoppingBtn" class="continue-shop-btn" style="flex: 1;"><i
+              class="fas fa-shopping-bag"></i> Continue Shopping</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACK ORDER DETAIL MODAL -->
+    <div id="trackDetailModal" class="modal-overlay">
+      <div class="edit-modal" style="max-width: 600px;">
+        <span class="close-modal" id="closeTrackModal">&times;</span>
+        <h3>Order Tracking Details</h3>
+        <div id="trackDetailContent"></div>
+        <button id="closeTrackBtn">Close</button>
+      </div>
+    </div>
+
+    <!-- AUTH MODALS -->
+    <div id="authModal" class="modal-overlay">
+      <div class="auth-modal"><span class="close-modal" id="closeAuthModal">&times;</span>
+        <div id="loginView">
+          <h2 style="text-align:center;">User Login</h2>
+          <div class="input-group"><input type="text" id="loginUsername" placeholder=" "><label>Username</label></div>
+          <div class="input-group"><input type="password" id="loginPassword" placeholder=" "><label>Password
+              (8 chars)</label></div>
+          <button id="loginBtn">Login</button>
+          <p style="text-align:center; margin-top:15px;">New? <span id="showRegisterView"
+              class="switch-link">Register</span></p>
+          <div id="loginMessage" style="color:red; text-align:center;"></div>
+        </div>
+        <div id="registerView" style="display:none;">
+          <h2 style="text-align:center;">Register</h2>
+          <div class="input-group"><input type="text" id="regUsername" placeholder=" "><label>Username</label>
+          </div>
+          <div class="input-group"><input type="email" id="regEmail" placeholder=" "><label>Email</label>
+          </div>
+          <div class="input-group"><input type="tel" id="regPhone" placeholder=" "><label>Phone</label></div>
+          <div class="input-group"><input type="password" id="regPassword" placeholder=" "><label>Password (8
+              chars)</label></div>
+          <button id="registerBtn">Register</button>
+          <p style="text-align:center; margin-top:15px;">Have account? <span id="showLoginView"
+              class="switch-link">Login</span></p>
+          <div id="registerMessage" style="color:red; text-align:center;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="adminLoginModal" class="modal-overlay">
+      <div class="auth-modal"><span class="close-modal" id="closeAdminModal">&times;</span>
+        <h2 style="text-align:center;">Admin Login</h2>
+        <div class="input-group"><input type="text" id="adminUsername" placeholder=" "><label>Admin ID</label>
+        </div>
+        <div class="input-group"><input type="password" id="adminPassword" placeholder=" "><label>Password</label>
+        </div>
+        <button id="adminLoginBtn">Login</button>
+        <div id="adminMessage" style="color:red; text-align:center;"></div>
+      </div>
+    </div>
+
+    <div id="editProductModal" class="modal-overlay">
+      <div class="edit-modal"><span class="close-modal" id="closeEditModal">&times;</span>
+        <h3>Edit Product</h3><input type="hidden" id="editProdId">
+        <div class="input-group"><input type="text" id="editProdName" placeholder=" "><label>Name</label></div>
+        <div class="input-group"><input type="number" id="editProdPrice" placeholder=" "><label>Price</label>
+        </div>
+        <div class="input-group"><select id="editProdCategory">
+            <option value="fruit">Fruit</option>
+            <option value="vegetable">Vegetable</option>
+            <option value="greens">Greens</option>
+          </select></div>
+        <div class="input-group"><input type="text" id="editProdImage" placeholder=" "><label>Image URL</label>
+        </div>
+        <button id="saveEditBtn">Save Changes</button>
+      </div>
+    </div>
+
+    <div id="orderDetailModal" class="modal-overlay">
+      <div class="edit-modal" style="max-width: 600px;">
+        <span class="close-modal" id="closeOrderDetailModal">&times;</span>
+        <h3>Order Details</h3>
+        <div id="orderDetailContent"></div>
+        <button id="closeOrderDetailBtn">Close</button>
+      </div>
+    </div>
+
+    <div id="cartOverlay" class="cart-overlay"></div>
+    <div id="cartSidebar" class="cart-sidebar">
+      <div style="display:flex; justify-content:space-between;">
+        <h3>Cart</h3><button id="closeCartBtn" style="font-size:1.8rem; background:none; width:auto;">&times;</button>
+      </div>
+      <ul id="cartItemsList"></ul>
+      <div id="cartTotalDisplay"></div>
+      <button id="checkoutBtn">Proceed to Checkout</button>
+    </div>
+    <script>
+      let products = [
+        {
+          id: 1, name: "Red Apple", pricePerKg: 180, image:
+            "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=200&h=160&fit=crop", category: "fruit"
+        },
+        {
+          id: 2, name: "Banana", pricePerKg: 60, image:
+            "https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=200&h=160&fit=crop", category: "fruit"
+        },
+        {
+          id: 3, name: "Orange", pricePerKg: 120, image:
+            "https://images.unsplash.com/photo-1547514701-427821017d18?w=200&h=160&fit=crop", category: "fruit"
+        },
+        {
+          id: 4, name: "Broccoli", pricePerKg: 90, image:
+            "https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?w=200&h=160&fit=crop", category: "vegetable"
+        },
+        {
+          id: 5, name: "Carrot", pricePerKg: 55, image:
+            "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=200&h=160&fit=crop", category: "vegetable"
+        },
+        {
+          id: 6, name: "Tomato", pricePerKg: 40, image:
+            "https://images.unsplash.com/photo-1546094096-0df4bcaaa41a?w=200&h=160&fit=crop", category: "vegetable"
+        },
+        {
+          id: 7, name: "Spinach", pricePerKg: 45, image:
+            "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=200&h=160&fit=crop", category: "greens"
+        },
+        {
+          id: 8, name: "Coriander", pricePerKg: 30, image:
+            "https://images.unsplash.com/photo-1615485500704-8e990f9900f2?w=200&h=160&fit=crop", category: "greens"
+        }
+      ];
+      let users = JSON.parse(localStorage.getItem("kanihub_users")) || [];
+      let currentUser = JSON.parse(localStorage.getItem("kanihub_currentUser")) || null;
+      let allOrders = JSON.parse(localStorage.getItem("kanihub_orders")) || [];
+      let currentCart = new Map();
+      let currentOrderDetails = null;
+
+      // Set default admin if no users exist
+      if (users.length === 0) {
+        users.push({ username: "vip", email: "admin@kani.com", password: "199206", isAdmin: true });
+        saveUsers();
+      }
+
+      function saveUsers() { localStorage.setItem("kanihub_users", JSON.stringify(users)); }
+      function saveProducts() { localStorage.setItem("kanihub_products", JSON.stringify(products)); }
+      function saveOrders() { localStorage.setItem("kanihub_orders", JSON.stringify(allOrders)); }
+      if (!localStorage.getItem("kanihub_products")) saveProducts(); else products =
+        JSON.parse(localStorage.getItem("kanihub_products"));
+
+      function getCart(u) {
+        if (!u) return new Map(); let s = localStorage.getItem(`cart_${u}`); if (s) {
+          let obj =
+            JSON.parse(s); return new Map(Object.entries(obj).map(([k, v]) => [parseInt(k), v]));
+        } return new Map();
+      }
+      function saveCart(u, map) {
+        if (!u) return; let obj = {}; for (let [id, data] of map) obj[id] = data;
+        localStorage.setItem(`cart_${u}`, JSON.stringify(obj));
+      }
+      function updateCartBadge() {
+        let total = 0; for (let i of currentCart.values()) total += i.quantityKg;
+        document.getElementById("cartItemCount").innerText = total.toFixed(1);
+      }
+
+      function addToCart(pid, qty) {
+        if (qty <= 0) return; let p = products.find(p => p.id === pid); if (!p) return; let
+          ex = currentCart.get(pid); if (ex) currentCart.set(pid, {
+            quantityKg: ex.quantityKg + qty, totalPrice:
+              ex.totalPrice + (p.pricePerKg * qty)
+          }); else currentCart.set(pid, {
+            quantityKg: qty, totalPrice:
+              p.pricePerKg * qty
+          }); if (currentUser) saveCart(currentUser.username, currentCart); updateCartBadge();
+        renderProductGrid(); renderCartSidebar();
+      }
+      function removeItem(pid) {
+        currentCart.delete(pid); if (currentUser) saveCart(currentUser.username,
+          currentCart); updateCartBadge(); renderProductGrid(); renderCartSidebar();
+      }
+
+      function renderProductGrid() {
+        let allProducts = products;
+        document.getElementById("productsContainer").innerHTML = allProducts.map(p => {
+          let cartItem = currentCart.get(p.id);
+          let inCart = cartItem ? cartItem.quantityKg.toFixed(2) : 0;
+          let icon = p.category === 'fruit' ? '🍎' : (p.category === 'vegetable' ? '🥕' : '🥬');
+          return `<div class="product-card">
+        <div class="product-img"><img src="${p.image}" alt="${p.name}"></div>
+        <div class="product-info">
+          <div class="product-title">${icon} ${p.name}</div>
+          <div class="product-price">₹${p.pricePerKg} / kg</div>
+          <div class="qty-input-group">
+            <input type="number" id="qty_${p.id}" value="1" min="0.5" step="0.5">
+            <button class="add-to-cart-btn" data-id="${p.id}">Add to Cart</button>
+          </div>
+          ${inCart > 0 ? `<div style="font-size:0.7rem; color:#1e5628; margin-top:5px;">✓ ${inCart} kg in cart
+          </div>` : ''}
+        </div>
+      </div>`;
+        }).join('');
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => btn.addEventListener('click', () => {
+          let id =
+            parseInt(btn.dataset.id); let qty = parseFloat(document.getElementById(`qty_${id}`).value); addToCart(id,
+              qty);
+        }));
+      }
+
+      function renderCartSidebar() {
+        let subtotal = 0; for (let i of currentCart.values()) subtotal += i.totalPrice;
+        let gst = subtotal * 0.05; let total = subtotal + gst;
+        let html = "";
+        for (let [pid, item] of currentCart) {
+          let p = products.find(pr => pr.id === pid);
+          if (p) html += `<li
+        style="display:flex; justify-content:space-between; margin:8px 0; padding:8px; background:#f9f2e0; border-radius:20px;">
+        <div><b>${p.name}</b><br>${item.quantityKg.toFixed(2)} kg</div>
+        <div>₹${item.totalPrice.toFixed(2)} <button class="remove-item" data-id="${pid}"
+            style="background:#bc4e2c; border:none; border-radius:30px; padding:2px 8px;">🗑️</button></div>
+      </li>`;
+        }
+        document.getElementById("cartItemsList").innerHTML = html || "<li style='text-align:center;'>Cart empty</li>";
+        document.getElementById("cartTotalDisplay").innerHTML = `<div style="margin-top:1rem;">
+        <p>Subtotal: ₹${subtotal.toFixed(2)}</p>
+        <p>GST 5%: ₹${gst.toFixed(2)}</p>
+        <p><b>Total: ₹${total.toFixed(2)}</b></p>
+      </div>`;
+        if (total >= 1000) {
+          document.getElementById("cartTotalDisplay").innerHTML += `<div
+        style="margin-top:10px; background:#ffd966; padding:8px; border-radius:20px; text-align:center;">
+        <i class="fas fa-gift"></i> ☀️ Summer Special! You qualify for FREE Organic Seeds (Tomato, Brinjal,
+        Chilli)! ☀️ <i class="fas fa-seedling"></i>
+      </div>`;
+        }
+        document.querySelectorAll('.remove-item').forEach(btn => btn.addEventListener('click', () =>
+          removeItem(parseInt(btn.dataset.id))));
+      }
+
+      function renderUserOrders() {
+        const container = document.getElementById("userOrdersList");
+        if (!container) return;
+        if (!currentUser) return;
+        const userOrders = allOrders.filter(o => o.username === currentUser.username).reverse();
+        if (userOrders.length === 0) {
+          container.innerHTML = "<div style='text-align:center; padding:2rem;'>No orders placed yet. Start shopping!</div>";
+          return;
+        }
+        container.innerHTML = userOrders.map(order => `
+      <div class="order-card" onclick="showOrderTracking('${order.orderId}')">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+          <div><strong>Order ID:</strong> ${order.orderId}</div>
+          <div><strong>Date:</strong> ${order.orderDate}</div>
+          <div><strong>Total:</strong> ₹${order.total.toFixed(2)}</div>
+          <div><span
+              style="background:#1e5628; color:white; padding:2px 10px; border-radius:20px; font-size:0.7rem;">${order.status
+          || 'Processing'}</span></div>
+        </div>
+        <div style="margin-top:10px; font-size:0.8rem; color:#666;">
+          <i class="fas fa-box"></i> ${order.items.length} items | <i class="fas fa-truck"></i> Expected by:
+          ${order.customer.deliveryDate}
+          ${order.total >= 1000 ? `<div style="color:#e6b422; margin-top:5px;"><i class="fas fa-seedling"></i>
+            Free Summer Seeds Added!</div>` : ''}
+        </div >
+      </div >
+          `).join('');
+      }
+
+      window.showOrderTracking = function (orderId) {
+        const order = allOrders.find(o => o.orderId === orderId);
+        if (!order) return;
+        const statuses = [
+          { step: "Order Placed", icon: "fa-check-circle", status: "placed" },
+          { step: "Order Confirmed", icon: "fa-clipboard-list", status: "confirmed" },
+          { step: "Preparing", icon: "fa-boxes", status: "preparing" },
+          { step: "Out for Delivery", icon: "fa-truck", status: "out_for_delivery" },
+          { step: "Delivered", icon: "fa-home", status: "delivered" }
+        ];
+        let currentStage = order.status || "placed";
+        const stepMap = { "placed": 0, "confirmed": 1, "preparing": 2, "out_for_delivery": 3, "delivered": 4 };
+        let activeIndex = stepMap[currentStage] || 0;
+
+        let statusHtml = `< div style = "margin-bottom:1.5rem;" >
+        <h4>Order: ${order.orderId}</h4>
+        <p>Placed on: ${order.orderDate}</p>
+      </div > `;
+        statusHtml += `< div class= "tracking-status" > `;
+        statuses.forEach((s, idx) => {
+          let isCompleted = idx <= activeIndex; let isActive = idx === activeIndex; statusHtml += ` < div
+          class= "status-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}" >
+          <div class="step-icon"><i class="fas ${s.icon}"></i></div>
+          <div class="step-label">${s.step}</div>
+          ${isCompleted ? '<div style="font-size:0.6rem; color:#1e5628;">✓</div>' : ''}
+      </div >
+          `;
+        });
+        statusHtml += `</div > `;
+        if (order.total >= 1000) {
+          statusHtml += `< div
+        style = "background:#ffd966; padding:10px; border-radius:20px; margin:10px 0; text-align:center;" >
+          <i class="fas fa-gift"></i> ☀️ Summer Special! This order includes FREE Organic Seeds(Tomato, Brinjal,
+            Chilli)! ☀️ <i class="fas fa-seedling"></i>
+      </div > `;
+        }
+        statusHtml += `
+          < hr >
+          <h4>Delivery Details:</h4>`;
+        statusHtml += `< p > <strong>Name:</strong> ${order.customer.name}</p > `;
+        statusHtml += `< p > <strong>Phone:</strong> ${order.customer.phone}</p > `;
+        statusHtml += `< p > <strong>Address:</strong> ${order.customer.address}, ${order.customer.pincode}</p > `;
+        statusHtml += `< p > <strong>Expected Delivery:</strong> ${order.customer.deliveryDate}</p > `;
+        statusHtml += `
+        < hr >
+      <h4>Items Ordered:</h4>
+      <ul>`;
+        order.items.forEach(i => {
+          statusHtml += `<li>${i.name} - ${i.quantityKg} kg x ₹${i.pricePerKg} = ₹${i.subtotal.toFixed(2)}</li>`;
+        });
+        statusHtml += `</ul>
+      <hr>
+      <p><strong>Payment Method:</strong> ${order.payment}</p>`;
+        statusHtml += `<p><strong>Grand Total:</strong> ₹${order.total.toFixed(2)}</p>`;
+        document.getElementById("trackDetailContent").innerHTML = statusHtml;
+        document.getElementById("trackDetailModal").classList.add("active");
+      };
+
+      function updatePaymentUI() {
+        let method = document.getElementById("paymentMethod").value;
+        let subtotal = 0; for (let i of currentCart.values()) subtotal += i.totalPrice;
+        let total = subtotal * 1.05;
+        let container = document.getElementById("paymentDetailsContainer");
+        if (method === "COD") {
+          container.innerHTML = "<p style='text-align:center;'>✅ Pay in cash when your order is delivered.</p>";
+        } else if (method === "UPI") {
+          container.innerHTML = `<div style="text-align:center;"><img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=upi://pay?pa=kanihub@okhdfcbank&pn=KANI%20HUB&am=${total}&cu=INR"
+          style="width:100px;">
+        <p>UPI ID: kanihub@okhdfcbank</p>
+        <p>Amount: ₹${total.toFixed(2)}</p>
+      </div>`;
+        } else {
+          container.innerHTML = `<div style="background:#e8f5e9; padding:1rem; border-radius:16px;">
+        <p><strong>Bank Details:</strong></p>
+        <p>Account: 123456789012</p>
+        <p>IFSC: HDFC0001234</p><input type="text" id="netAccNumber" placeholder="Account Number"
+          style="width:100%; margin-top:10px; padding:8px; border-radius:30px; border:1px solid #ccc;"><input
+          type="text" id="netIfsc" placeholder="IFSC Code"
+          style="width:100%; margin-top:5px; padding:8px; border-radius:30px; border:1px solid #ccc;"><input
+          type="number" id="netAmount" placeholder="Amount" value="${total}"
+          style="width:100%; margin-top:5px; padding:8px; border-radius:30px; border:1px solid #ccc;">
+      </div>`;
+        }
+        document.getElementById("priceBreakdown").innerHTML = `<p>Subtotal: ₹${subtotal.toFixed(2)}</p>
+      <p>GST (5%): ₹${(subtotal * 0.05).toFixed(2)}</p>
+      <p><b>Grand Total: ₹${total.toFixed(2)}</b></p>`;
+        if (total >= 1000) {
+          document.getElementById("priceBreakdown").innerHTML += `<div
+        style="margin-top:10px; background:#ffd966; padding:8px; border-radius:20px; text-align:center;">
+        <i class="fas fa-gift"></i> ☀️ Summer Special! You qualify for FREE Organic Seeds (Tomato, Brinjal,
+        Chilli)! ☀️
+      </div>`;
+        }
+      }
+
+      function generateInvoice(order) {
+        let freeSeedsHtml = order.total >= 1000 ? `<div
+        style="background:#ffd966; padding:10px; border-radius:20px; margin:10px 0; text-align:center;">
+        <i class="fas fa-gift"></i> ☀️ Summer Special! FREE Organic Seeds (Tomato, Brinjal, Chilli) Included! ☀️
+        <i class="fas fa-seedling"></i>
+      </div>` : '';
+        let html = `<div id="invoicePrint">
+        <h2 style="text-align:center;">🌱 KANI HUB Invoice</h2>
+        <p><strong>Order ID:</strong> ${order.orderId}</p>
+        <p><strong>Date:</strong> ${order.orderDate}</p>
+        <p><strong>Customer Name:</strong> ${order.customer.name}</p>
+        <p><strong>Phone:</strong> ${order.customer.phone}</p>
+        <p><strong>Address:</strong> ${order.customer.address}, ${order.customer.pincode}</p>
+        <p><strong>Delivery Date:</strong> ${order.customer.deliveryDate}</p>
+        <p><strong>Payment Method:</strong> ${order.payment}</p>
+        ${freeSeedsHtml}
+        <hr>
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background:#1e5628; color:white;">
+              <th>Product</th>
+              <th>Qty (kg)</th>
+              <th>Price/kg</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>${order.items.map(i => `<tr>
+              <td>${i.name}</td>
+              <td>${i.quantityKg.toFixed(2)}</td>
+              <td>₹${i.pricePerKg}</td>
+              <td>₹${i.subtotal.toFixed(2)}</td>
+            </tr>`).join('')}</tbody>
+        </table>
+        <hr>
+        <p><strong>Subtotal:</strong> ₹${order.subtotal.toFixed(2)}</p>
+        <p><strong>GST (5%):</strong> ₹${order.gst.toFixed(2)}</p>
+        <p style="font-size:1.2rem;"><strong>Grand Total: ₹${order.total.toFixed(2)}</strong></p>
+        <hr>
+        <p style="text-align:center;">Thank you for shopping at KANI HUB! 🌿</p>
+        <p style="text-align:center;">Fresh from Farm to Fork</p>
+      </div>`;
+        document.getElementById("invoiceContent").innerHTML = html;
+        window.currentInvoice = order;
+      }
+
+      // Admin Functions
+      function renderAdminProducts() {
+        const tbody = document.getElementById("productsTableBody");
+        if (!tbody) return;
+        tbody.innerHTML = products.map(p => `
+      <tr>
+        <td><img class="product-img-thumb" src="${p.image}"
+            onerror="this.src='https://cdn-icons-png.flaticon.com/512/1623/1623784.png'"></td>
+        <td><strong>${p.name}</strong></td>
+        <td>${p.category}</td>
+        <td>₹${p.pricePerKg}</td>
+        <td><button class="action-btn edit-btn" data-id="${p.id}">Edit</button> <button class="action-btn delete-btn"
+            data-id="${p.id}">Delete</button></td>
+      </tr>
+      `).join('');
+        document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => {
+          let prod =
+            products.find(p => p.id == btn.dataset.id); if (prod) {
+              document.getElementById("editProdId").value =
+                prod.id; document.getElementById("editProdName").value = prod.name;
+              document.getElementById("editProdPrice").value = prod.pricePerKg;
+              document.getElementById("editProdCategory").value = prod.category;
+              document.getElementById("editProdImage").value = prod.image;
+              document.getElementById("editProductModal").classList.add("active");
+            }
+        }));
+        document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', () => {
+          if
+            (confirm("Delete product?")) {
+            products = products.filter(p => p.id != btn.dataset.id); saveProducts();
+            renderAdminProducts(); updateStats(); renderProductGrid();
+          }
+        }));
+        updateStats();
+      }
+
+      document.getElementById("addProductBtn")?.addEventListener("click", () => {
+        let name = document.getElementById("prodName").value.trim();
+        let price = parseFloat(document.getElementById("prodPrice").value);
+        let cat = document.getElementById("prodCategory").value;
+        let img = document.getElementById("prodImage").value.trim();
+        if (!name || isNaN(price)) { alert("Valid product details required"); return; }
+        let newId = products.length ? Math.max(...products.map(p => p.id)) + 1 : 9;
+        products.push({
+          id: newId, name, pricePerKg: price, category: cat, image: img ||
+            "https://cdn-icons-png.flaticon.com/512/1623/1623784.png"
+        });
+        saveProducts(); renderAdminProducts(); renderProductGrid();
+        document.getElementById("prodName").value = ""; document.getElementById("prodPrice").value = "";
+        document.getElementById("prodImage").value = "";
+      });
+
+      document.getElementById("saveEditBtn")?.addEventListener("click", () => {
+        let id = parseInt(document.getElementById("editProdId").value);
+        let idx = products.findIndex(p => p.id === id);
+        if (idx !== -1) {
+          products[idx].name = document.getElementById("editProdName").value;
+          products[idx].pricePerKg = parseFloat(document.getElementById("editProdPrice").value);
+          products[idx].category = document.getElementById("editProdCategory").value;
+          products[idx].image = document.getElementById("editProdImage").value;
+          saveProducts(); renderAdminProducts(); renderProductGrid();
+          document.getElementById("editProductModal").classList.remove("active");
+        }
+      });
+
+      function renderAdminUsers() {
+        const tbody = document.getElementById("usersTableBody");
+        if (!tbody) return;
+        const normalUsers = users.filter(u => !u.isAdmin);
+        tbody.innerHTML = normalUsers.map(u => `
+      <tr>
+        <td><i class="fas fa-user-circle"></i> ${u.username}</td>
+        <td>${u.email}</td>
+        <td>${u.phone || "—"}</td>
+        <td>${allOrders.filter(o => o.username === u.username).length}</td>
+        <td><button class="action-btn delete-btn delete-user-btn" data-username="${u.username}">Delete</button>
+        </td>
+      </tr>
+      `).join('');
+        document.querySelectorAll('.delete-user-btn').forEach(btn => btn.addEventListener('click', () => {
+          if
+            (confirm("Delete user?")) {
+            users = users.filter(u => u.username !== btn.dataset.username); allOrders =
+              allOrders.filter(o => o.username !== btn.dataset.username); saveUsers(); saveOrders(); renderAdminUsers();
+            renderAdminOrders(); updateStats();
+          }
+        }));
+        updateStats();
+      }
+
+      function renderAdminOrders() {
+        const tbody = document.getElementById("ordersTableBody");
+        if (!tbody) return;
+        if (allOrders.length === 0) { tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>No orders yet</td></tr>"; updateStats(); return; }
+        tbody.innerHTML = allOrders.slice().reverse().map(o => `
+      <tr>
+        <td><span style="background:#e9f0e3; padding:4px 8px; border-radius:50px;">${o.orderId}</span></td>
+        <td>${o.customer.name}</td>
+        <td>${o.customer.phone}</td>
+        <td>₹${o.total.toFixed(2)}</td>
+        <td>
+          <select class="status-update" data-orderid="${o.orderId}" style="padding:4px; border-radius:20px;">
+            <option value="placed" ${o.status === 'placed' ? 'selected' : ''}>Placed</option>
+            <option value="confirmed" ${o.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+            <option value="preparing" ${o.status === 'preparing' ? 'selected' : ''}>Preparing</option>
+            <option value="out_for_delivery" ${o.status === 'out_for_delivery' ? 'selected' : ''}>Out for
+              Delivery</option>
+            <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+          </select>
+        </td>
+        <td>${o.orderDate}</td>
+        <td><button class="action-btn view-btn view-order-btn" data-order='${JSON.stringify(o).replace(/' /g, "&#39;"
+        )}'>View</button> <button class="action-btn delete-btn delete-order-btn"
+            data-orderid="${o.orderId}">Delete</button></td>
+      </tr>
+      `).join('');
+        document.querySelectorAll('.status-update').forEach(select => select.addEventListener('change', function () {
+          let order = allOrders.find(o => o.orderId === this.dataset.orderid);
+          if (order) {
+            order.status = this.value; saveOrders(); renderAdminOrders(); if (currentUser &&
+              !currentUser.isAdmin) renderUserOrders();
+          }
+        }));
+        document.querySelectorAll('.view-order-btn').forEach(btn => btn.addEventListener('click', () => {
+          let order
+            = JSON.parse(btn.dataset.order); showOrderDetails(order);
+        }));
+        document.querySelectorAll('.delete-order-btn').forEach(btn => btn.addEventListener('click', () => {
+          if
+            (confirm("Delete order?")) {
+            allOrders = allOrders.filter(o => o.orderId !== btn.dataset.orderid);
+            saveOrders(); renderAdminOrders(); if (currentUser && !currentUser.isAdmin) renderUserOrders();
+            updateStats();
+          }
+        }));
+        updateStats();
+      }
+
+      function showOrderDetails(order) {
+        document.getElementById("orderDetailContent").innerHTML = `
+      <div><strong>Order ID:</strong> ${order.orderId}</div>
+      <div><strong>Date:</strong> ${order.orderDate}</div>
+      <div><strong>Customer:</strong> ${order.customer.name}</div>
+      <div><strong>Phone:</strong> ${order.customer.phone}</div>
+      <div><strong>Address:</strong> ${order.customer.address}, ${order.customer.pincode}</div>
+      <div><strong>Delivery Date:</strong> ${order.customer.deliveryDate}</div>
+      <hr>
+      <h4>Items:</h4>
+      <ul>${order.items.map(i => `<li>${i.name} - ${i.quantityKg}kg x ₹${i.pricePerKg} = ₹${i.subtotal.toFixed(2)}
+        </li>`).join('')}</ul>
+      <hr>
+      <div><strong>Subtotal:</strong> ₹${order.subtotal.toFixed(2)}</div>
+      <div><strong>GST 5%:</strong> ₹${order.gst.toFixed(2)}</div>
+      <div style="font-size:1.2rem;"><strong>Total: ₹${order.total.toFixed(2)}</strong></div>`;
+        document.getElementById("orderDetailModal").classList.add("active");
+      }
+
+      function updateStats() {
+        document.getElementById("statProducts").innerText = products.length;
+        document.getElementById("statUsers").innerText = users.filter(u => !u.isAdmin).length;
+        document.getElementById("statOrders").innerText = allOrders.length;
+      }
+
+      // Auth Functions
+      function handleLogin() {
+        let uname = document.getElementById("loginUsername").value.trim();
+        let pwd = document.getElementById("loginPassword").value;
+        let user = users.find(u => u.username === uname && u.password === pwd && !u.isAdmin);
+        if (user) { setCurrentUser(user); document.getElementById("authModal").classList.remove("active"); }
+        else { document.getElementById("loginMessage").innerText = "Invalid username or password"; }
+      }
+
+      function handleRegister() {
+        let uname = document.getElementById("regUsername").value.trim();
+        let email = document.getElementById("regEmail").value.trim();
+        let phone = document.getElementById("regPhone").value.trim();
+        let pwd = document.getElementById("regPassword").value;
+        if (!uname || !email || !phone || pwd.length !== 8) {
+          alert("Password must be exactly 8 characters. All fields required."); return;
+        }
+        if (users.find(u => u.username === uname)) { alert("Username already exists!"); return; }
+        users.push({ username: uname, email: email, password: pwd, phone: phone, isAdmin: false });
+        saveUsers();
+        alert("Registration successful! Please login.");
+        document.getElementById("showLoginView").click();
+      }
+
+      function handleAdminLogin() {
+        let uname = document.getElementById("adminUsername").value.trim();
+        let pwd = document.getElementById("adminPassword").value.trim();
+        if (uname === "vip" && pwd === "199206") {
+          let admin = users.find(u => u.username === "vip");
+          if (!admin) {
+            admin = { username: "vip", email: "admin@kani.com", password: "199206", isAdmin: true };
+            users.push(admin); saveUsers();
+          }
+          else if (!admin.isAdmin) { admin.isAdmin = true; saveUsers(); }
+          setCurrentUser(admin);
+          document.getElementById("adminLoginModal").classList.remove("active");
+        } else { document.getElementById("adminMessage").innerHTML = "Invalid credentials! Use vip / 199206"; }
+      }
+
+      function setCurrentUser(user) {
+        currentUser = user;
+        localStorage.setItem("kanihub_currentUser", JSON.stringify(user));
+        if (user) {
+          document.getElementById("welcomePage").style.display = "none";
+          document.getElementById("userDisplayArea").style.display = "flex";
+          document.getElementById("logoutBtn").style.display = "block";
+          document.getElementById("aboutNavBtn").style.display = "inline-block";
+          document.getElementById("trackOrderNavBtn").style.display = "inline-block";
+          document.getElementById("cartIconBtn").style.display = "flex";
+          if (user.isAdmin) {
+            document.getElementById("storeContent").classList.remove("visible");
+            document.getElementById("aboutPage").classList.remove("visible");
+            document.getElementById("trackOrderPage").classList.remove("visible");
+            document.getElementById("adminDashboard").style.display = "block";
+            document.getElementById("currentUsername").innerHTML = "Admin";
+            renderAdminProducts(); renderAdminUsers(); renderAdminOrders();
+          } else {
+            document.getElementById("adminDashboard").style.display = "none";
+            document.getElementById("aboutPage").classList.add("visible");
+            document.getElementById("trackOrderPage").classList.remove("visible");
+            document.getElementById("storeContent").classList.remove("visible");
+            document.getElementById("currentUsername").innerHTML = user.username;
+            currentCart = getCart(user.username);
+            updateCartBadge(); renderProductGrid(); renderCartSidebar(); renderUserOrders();
+          }
+        } else {
+          document.getElementById("welcomePage").style.display = "flex";
+          document.getElementById("storeContent").classList.remove("visible");
+          document.getElementById("aboutPage").classList.remove("visible");
+          document.getElementById("trackOrderPage").classList.remove("visible");
+          document.getElementById("adminDashboard").style.display = "none";
+          document.getElementById("userDisplayArea").style.display = "none";
+          document.getElementById("logoutBtn").style.display = "none";
+          document.getElementById("aboutNavBtn").style.display = "none";
+          document.getElementById("trackOrderNavBtn").style.display = "none";
+          document.getElementById("cartIconBtn").style.display = "none";
+          currentCart.clear();
+        }
+      }
+
+      function logout() { setCurrentUser(null); }
+
+      // Event Listeners
+      document.getElementById("checkoutBtn").onclick = function () {
+        if (!currentUser || currentUser.isAdmin) { alert("Please login as user first"); return; }
+        if (currentCart.size === 0) { alert("Your cart is empty!"); return; }
+        document.getElementById("cartSidebar").classList.remove("open");
+        document.getElementById("cartOverlay").classList.remove("open");
+        document.getElementById("customerDetailsModal").classList.add("active");
+      };
+
+      document.getElementById("nextToPaymentBtn").onclick = function () {
+        let name = document.getElementById("custName").value.trim();
+        let phone = document.getElementById("custPhone").value.trim();
+        let address = document.getElementById("custAddress").value.trim();
+        let pincode = document.getElementById("custPincode").value.trim();
+        let deliveryDate = document.getElementById("deliveryDate").value;
+        if (!name || !phone || !address || !pincode || !deliveryDate) {
+          alert("Please fill all delivery details");
+          return;
+        }
+        currentOrderDetails = { name, phone, address, pincode, deliveryDate };
+        document.getElementById("customerDetailsModal").classList.remove("active");
+        updatePaymentUI();
+        document.getElementById("paymentModal").classList.add("active");
+      };
+
+      document.getElementById("paymentMethod").onchange = updatePaymentUI;
+
+      document.getElementById("placeOrderBtn").onclick = function () {
+        let method = document.getElementById("paymentMethod").value;
+        if (method === "NetBanking") {
+          let acc = document.getElementById("netAccNumber")?.value;
+          let ifsc = document.getElementById("netIfsc")?.value;
+          if (!acc || !ifsc) { alert("Please enter bank details"); return; }
+        }
+        let subtotal = 0; let items = [];
+        for (let [pid, item] of currentCart) {
+          let p = products.find(pr => pr.id === pid);
+          if (p) {
+            items.push({ ...p, quantityKg: item.quantityKg, subtotal: item.totalPrice }); subtotal +=
+              item.totalPrice;
+          }
+        }
+        let order = {
+          orderId: "ORD" + Date.now(),
+          customer: currentOrderDetails,
+          items: items,
+          subtotal: subtotal,
+          gst: subtotal * 0.05,
+          total: subtotal * 1.05,
+          payment: method,
+          status: "placed",
+          orderDate: new Date().toLocaleString(),
+          username: currentUser.username
+        };
+        allOrders.push(order);
+        saveOrders();
+        generateInvoice(order);
+        document.getElementById("paymentModal").classList.remove("active");
+        document.getElementById("invoiceModal").classList.add("active");
+        currentCart.clear();
+        if (currentUser) saveCart(currentUser.username, currentCart);
+        updateCartBadge();
+        renderProductGrid();
+        renderCartSidebar();
+        if (currentUser.isAdmin) { renderAdminOrders(); }
+        if (currentUser && !currentUser.isAdmin) { renderUserOrders(); }
+      };
+
+      document.getElementById("downloadInvoiceBtn").onclick = function () {
+        if (document.getElementById("invoicePrint")) {
+          html2pdf().from(document.getElementById("invoicePrint")).set({
+            margin: 1, filename:
+              `Invoice_${window.currentInvoice?.orderId || 'order'}.pdf`
+          }).save();
+        }
+      };
+
+      document.getElementById("continueShoppingBtn").onclick = function () {
+        document.getElementById("invoiceModal").classList.remove("active");
+        document.getElementById("storeContent").classList.add("visible");
+        document.getElementById("aboutPage").classList.remove("visible");
+        document.getElementById("trackOrderPage").classList.remove("visible");
+        renderProductGrid();
+      };
+
+      // Modal close buttons
+      document.getElementById("closeCustomerModal").onclick = function () {
+        document.getElementById("customerDetailsModal").classList.remove("active");
+      };
+      document.getElementById("closePaymentModal").onclick = function () {
+        document.getElementById("paymentModal").classList.remove("active");
+      };
+      document.getElementById("closeInvoiceModal").onclick = function () {
+        document.getElementById("invoiceModal").classList.remove("active");
+      };
+      document.getElementById("closeAuthModal").onclick = function () {
+        document.getElementById("authModal").classList.remove("active");
+      };
+      document.getElementById("closeAdminModal").onclick = function () {
+        document.getElementById("adminLoginModal").classList.remove("active");
+      };
+      document.getElementById("closeEditModal").onclick = function () {
+        document.getElementById("editProductModal").classList.remove("active");
+      };
+      document.getElementById("closeOrderDetailModal").onclick = function () {
+        document.getElementById("orderDetailModal").classList.remove("active");
+      };
+      document.getElementById("closeOrderDetailBtn").onclick = function () {
+        document.getElementById("orderDetailModal").classList.remove("active");
+      };
+      document.getElementById("closeTrackModal").onclick = function () {
+        document.getElementById("trackDetailModal").classList.remove("active");
+      };
+      document.getElementById("closeTrackBtn").onclick = function () {
+        document.getElementById("trackDetailModal").classList.remove("active");
+      };
+      document.getElementById("closeCartBtn").onclick = function () {
+        document.getElementById("cartSidebar").classList.remove("open");
+        document.getElementById("cartOverlay").classList.remove("open");
+      };
+      document.getElementById("cartOverlay").onclick = function () {
+        document.getElementById("cartSidebar").classList.remove("open");
+        document.getElementById("cartOverlay").classList.remove("open");
+      };
+      document.getElementById("cartIconBtn").onclick = function () {
+        if (!currentUser || currentUser.isAdmin) {
+          alert("Login as user first"); return;
+        } document.getElementById("cartSidebar").classList.add("open");
+        document.getElementById("cartOverlay").classList.add("open"); renderCartSidebar();
+      };
+      document.getElementById("showRegisterView").onclick = function () {
+        document.getElementById("loginView").style.display = "none";
+        document.getElementById("registerView").style.display = "block";
+      };
+      document.getElementById("showLoginView").onclick = function () {
+        document.getElementById("registerView").style.display = "none";
+        document.getElementById("loginView").style.display = "block";
+      };
+      document.getElementById("loginBtn").onclick = handleLogin;
+      document.getElementById("registerBtn").onclick = handleRegister;
+      document.getElementById("adminLoginBtn").onclick = handleAdminLogin;
+      document.getElementById("logoutBtn").onclick = logout;
+      document.getElementById("welcomeUserBtn").onclick = function (e) {
+        e.preventDefault();
+        document.getElementById("authModal").classList.add("active");
+        document.getElementById("loginView").style.display = "block";
+        document.getElementById("registerView").style.display = "none";
+      };
+      document.getElementById("welcomeAdminBtn").onclick = function (e) {
+        e.preventDefault();
+        document.getElementById("adminLoginModal").classList.add("active");
+      };
+      document.getElementById("aboutNavBtn").onclick = function () {
+        if (currentUser && !currentUser.isAdmin) {
+          document.getElementById("storeContent").classList.remove("visible");
+          document.getElementById("trackOrderPage").classList.remove("visible");
+          document.getElementById("aboutPage").classList.add("visible");
+        }
+      };
+      document.getElementById("trackOrderNavBtn").onclick = function () {
+        if (currentUser && !currentUser.isAdmin) {
+          document.getElementById("storeContent").classList.remove("visible");
+          document.getElementById("aboutPage").classList.remove("visible");
+          document.getElementById("trackOrderPage").classList.add("visible"); renderUserOrders();
+        }
+      };
+      document.getElementById("shopNowFromAboutBtn").onclick = function () {
+        if (currentUser &&
+          !currentUser.isAdmin) {
+          document.getElementById("aboutPage").classList.remove("visible");
+          document.getElementById("trackOrderPage").classList.remove("visible");
+          document.getElementById("storeContent").classList.add("visible"); renderProductGrid();
+        }
+      };
+
+      // Initialize
+      if (currentUser) setCurrentUser(currentUser); else setCurrentUser(null);
+      renderProductGrid();
+    </script>
+    <script src="js/app.js"></script>
+  </body>
+
+</html>
